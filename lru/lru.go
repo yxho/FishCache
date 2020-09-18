@@ -3,6 +3,7 @@ package lru
 import "container/list"
 
 //LRU(Least Recently Used)
+// 最近最少访问(Least Recently Used, LRU)
 //最近最少使用，相对于仅考虑时间因素的 FIFO 和仅考虑访问频率的 LFU，LRU 算法可以认为是相对平衡的一种淘汰算法。
 //LRU 认为，如果数据最近被访问过，那么将来被访问的概率也会更高。LRU 算法的实现非常简单，维护一个队列，如果某条记录被访问了，则移动到队尾，
 //那么队首则是最近最少访问的数据，淘汰该条记录即可。
@@ -10,7 +11,7 @@ import "container/list"
 // LRU缓存
 type Cache struct {
 	maxBytes  int64      //允许使用的最大内存
-	nbytes    int64      //当前已用的内存
+	nowbytes  int64      //当前已用的内存
 	ll        *list.List //双向链表
 	cache     map[string]*list.Element
 	OnEvicted func(key string, value Value)
@@ -59,7 +60,7 @@ func (c *Cache) RemoveOldest() {
 		c.ll.Remove(ele)
 		kv := ele.Value.(*entry)
 		delete(c.cache, kv.key)
-		c.nbytes -= int64(len(kv.key)) + int64(kv.value.Len())
+		c.nowbytes -= int64(len(kv.key)) + int64(kv.value.Len())
 		if c.OnEvicted != nil {
 			c.OnEvicted(kv.key, kv.value)
 		}
@@ -73,14 +74,14 @@ func (c *Cache) Add(key string, value Value) {
 	if ele, ok := c.cache[key]; ok {
 		c.ll.MoveToBack(ele)
 		kv := ele.Value.(*entry)
-		c.nbytes += int64(value.Len()) - int64(kv.value.Len())
+		c.nowbytes += int64(value.Len()) - int64(kv.value.Len())
 		kv.value = value
 	} else {
 		ele := c.ll.PushBack(&entry{key, value})
 		c.cache[key] = ele
-		c.nbytes += int64(len(key)) + int64(value.Len())
+		c.nowbytes += int64(len(key)) + int64(value.Len())
 	}
-	for c.maxBytes != 0 && c.maxBytes < c.nbytes {
+	for c.maxBytes != 0 && c.maxBytes < c.nowbytes {
 		c.RemoveOldest()
 	}
 }
