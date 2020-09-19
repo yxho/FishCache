@@ -48,6 +48,7 @@ func NewGroup(name string,cacheSize int64,getter Getter)*Group{
 // GetGroup returns the named group previously created with NewGroup, or
 // nil if there's no such group.
 func GetGroup(name string) *Group {
+	log.Println("[FishCache] G")
 	mu.RLock()
 	g := groups[name]
 	mu.RUnlock()
@@ -73,6 +74,7 @@ func (g *Group) load(key string) (value ByteView, err error) {
 }
 
 func (g *Group) getLocally(key string) (ByteView, error) {
+	fmt.Printf("GETTER")
 	bytes, err := g.getter.Get(key)
 	if err != nil {
 		return ByteView{}, err
