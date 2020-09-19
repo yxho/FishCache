@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const defaultBasePath = "/_fishcache"
+const defaultBasePath = "/_fishcache/"
 
 type HTTPPool struct {
 	self     string
