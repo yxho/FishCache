@@ -12,14 +12,14 @@ import (
 //这是 Go 语言中将其他函数（参数返回值定义与 F 一致）转换为接口 A 的常用技巧。
 // A Getter loads data for a key.
 type Getter interface {
-	Get(key string) ([]byte, error)
+	GetFromDb(key string) ([]byte, error)
 }
 
 // A GetterFunc implements Getter with a function.
 type GetterFunc func(key string) ([]byte, error)
 
 // Get implements Getter interface function
-func (f GetterFunc) Get(key string) ([]byte, error) {
+func (f GetterFunc) GetFromDb(key string) ([]byte, error) {
 	return f(key)
 }
 
@@ -110,7 +110,7 @@ func (g *Group) getFromPeer(peer PeerGetter, key string) (ByteView, error) {
 		Key:   key,
 	}
 	res := &pb.Response{}
-	err := peer.Get(req, res)
+	err := peer.rpcGet(req, res)
 	if err != nil {
 		return ByteView{}, err
 	}
@@ -118,7 +118,7 @@ func (g *Group) getFromPeer(peer PeerGetter, key string) (ByteView, error) {
 }
 
 func (g *Group) getLocally(key string) (ByteView, error) {
-	bytes, err := g.getter.Get(key)
+	bytes, err := g.getter.GetFromDb(key)
 	if err != nil {
 		return ByteView{}, err
 

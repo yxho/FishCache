@@ -8,5 +8,5 @@ type PeerPicker interface {
 
 // PeerGetter is the interface that must be implemented by a peer.
 type PeerGetter interface {
-	Get(in *pb.Request, out *pb.Response) error
+	rpcGet(in *pb.Request, out *pb.Response) error
 }

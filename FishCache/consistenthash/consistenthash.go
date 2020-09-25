@@ -43,7 +43,7 @@ func (m *Map) Add(keys ...string) {
 }
 
 // Get gets the closest item in the hash to the provided key.
-func (m *Map) Get(key string) string {
+func (m *Map) GetPeer(key string) string {
 	if len(m.hashRing) == 0 {
 		return ""
 	}

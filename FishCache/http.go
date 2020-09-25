@@ -68,11 +68,13 @@ func (p *HTTPPool) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Write(body)
 }
 
+
+
 type httpGetter struct {
 	baseURL string
 }
 
-func (h *httpGetter) Get(in *pb.Request, out *pb.Response) error {
+func (h *httpGetter) rpcGet(in *pb.Request, out *pb.Response) error {
 	u := fmt.Sprintf(
 		"%v%v/%v",
 		h.baseURL,
@@ -118,7 +120,7 @@ func (p *HTTPPool) Set(peers ...string) {
 func (p *HTTPPool) PickPeer(key string) (PeerGetter, bool) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	if peer := p.peers.Get(key); peer != "" && peer != p.self {
+	if peer := p.peers.GetPeer(key); peer != "" && peer != p.self {
 		p.Log("Pick peer %s", peer)
 		return p.httpGetters[peer], true
 	}
